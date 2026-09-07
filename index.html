@@ -954,9 +954,12 @@
         orden.forEach(o => {
           const id = typeof o === 'string' ? o : o.id;
           const visible = typeof o === 'string' ? true : o.visible !== false;
+          const bg = typeof o === 'object' ? o.bg : null;
           const sec = secciones[id];
           if (!sec) return;
           sec.style.display = visible ? '' : 'none';
+          if (bg) sec.style.backgroundColor = bg;
+          else sec.style.backgroundColor = '';
           // Mover también el divisor siguiente si existe (el div.h-8 que sigue a la sección)
           const next = sec.nextElementSibling;
           const isDivider = next && next.matches('div.h-8, div.h-9, div.h-10');
