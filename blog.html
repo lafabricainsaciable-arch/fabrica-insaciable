@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Blog — La Fábrica Insaciable de Producir Ideas">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2306B6D4'/><text x='50' y='68' text-anchor='middle' font-size='60' fill='white' font-family='serif'>F</text></svg>">
+  <title>Blog · La Fábrica Insaciable de Producir Ideas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,600&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="posts.defaults.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            panel:   '#0A0A14',
+            surface: '#34344E',
+            edge:    '#3A3A46',
+            ink:     '#F2F1ED',
+            dim:     '#A9AAB6',
+            lavanda: '#06B6D4',
+            sol:     '#FFCF5C',
+            play:    '#FF5C7A',
+            ok:      '#5BE49B',
+          },
+          fontFamily: {
+            serif: ['Fraunces', 'Georgia', 'serif'],
+            sans:  ['Space Grotesk', 'system-ui', 'sans-serif'],
+            mono:  ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+          boxShadow: {
+            glow: '0 0 0 1px #06B6D433, 0 0 20px #06B6D422',
+          },
+        },
+      },
+    };
+  </script>
+</head>
+<body class="bg-panel text-ink font-sans antialiased selection:bg-lavanda selection:text-panel">
+
+  <header class="sticky top-0 z-50 border-b border-edge bg-panel/90 backdrop-blur">
+    <nav class="mx-auto flex max-w-4xl items-center justify-between px-6 py-4" aria-label="Principal">
+      <a href="index.html" class="font-serif text-lg italic tracking-tight">
+        La Fábrica <span class="text-lavanda">Insaciable</span>
+        <span class="block font-mono text-[10px] uppercase tracking-[0.3em] text-dim not-italic">blog de la fábrica</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="rounded-md border border-edge px-3 py-2 font-mono text-[11px] uppercase tracking-[0.2em] text-dim transition hover:border-lavanda hover:text-lavanda">Volver al sitio</a>
+        <a href="index.html#contacto" class="rounded-md border border-lavanda px-4 py-2 text-sm text-lavanda transition hover:bg-lavanda hover:text-panel">Pedir una idea</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="blog" class="border-b border-edge">
+      <div class="mx-auto max-w-4xl px-6 py-16">
+
+        <p class="mb-4 font-mono text-xs uppercase tracking-[0.3em] text-play">Blog de la fábrica</p>
+        <h1 class="font-serif text-4xl font-light leading-tight md:text-5xl">
+          La idea que
+          <br>
+          <em class="text-lavanda">no se deja atrapar.</em>
+        </h1>
+        <p class="mt-4 max-w-lg text-sm leading-relaxed text-dim">
+          Análisis cortos de ideas nuevas: qué se muestra, qué se sostiene sin mostrarse del todo,
+          y por qué. Publicado desde el panel de administración.
+        </p>
+
+        <div class="mt-12 grid gap-6 md:grid-cols-2" data-lista-posts></div>
+
+        <div data-post-detalle class="hidden">
+          <a href="blog.html" class="font-mono text-[11px] uppercase tracking-[0.2em] text-dim transition hover:text-lavanda">← Volver al blog</a>
+          <article class="mt-6">
+            <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-sol" data-post-fecha></p>
+            <h2 class="mt-3 font-serif text-3xl font-light leading-tight md:text-4xl" data-post-titulo></h2>
+            <p class="mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-dim" data-post-etiquetas></p>
+            <div class="mt-8 space-y-5" data-post-cuerpo></div>
+            <div class="mt-10 rounded-lg border border-edge bg-surface p-6">
+              <p class="font-serif text-lg">¿Esta idea te toca algún proyecto?</p>
+              <p class="mt-1 text-sm text-dim">Escribinos y lo trabajamos para tu marca.</p>
+              <a href="index.html#contacto" class="mt-4 inline-block rounded-md bg-lavanda px-5 py-2.5 text-sm font-medium text-panel transition hover:brightness-110">Hablar con la fábrica →</a>
+            </div>
+          </article>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-edge">
+    <div class="mx-auto max-w-4xl px-6 py-10">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <a href="index.html" class="font-serif text-base italic tracking-tight">
+          La Fábrica <span class="text-lavanda">Insaciable</span>
+        </a>
+        <p class="text-xs text-dim">© <span data-anio>2026</span> La Fábrica Insaciable de Producir Ideas · Todos los derechos reservados</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem('fabrica_' + k)); return v ?? d; } catch { return d; } };
+    const esc = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    let posts = load('posts', window.POSTS_DEFECTO);
+    if (!localStorage.getItem('fabrica_posts')) localStorage.setItem('fabrica_posts', JSON.stringify(posts));
+
+    const fechaLarga = f => new Date(f + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+    const params = new URLSearchParams(location.search);
+    const slugActual = params.get('post');
+
+    if (slugActual) {
+      const post = posts.find(p => p.slug === slugActual);
+      if (post) {
+        document.querySelector('[data-lista-posts]').classList.add('hidden');
+        document.querySelector('[data-post-detalle]').classList.remove('hidden');
+        document.querySelector('[data-post-fecha]').textContent = fechaLarga(post.fecha);
+        document.querySelector('[data-post-titulo]').textContent = post.titulo;
+        document.querySelector('[data-post-etiquetas]').textContent = (post.etiquetas || []).join(' · ');
+        document.querySelector('[data-post-cuerpo]').innerHTML = post.cuerpo.split(/\n\s*\n/).map(p => '<p class="text-base leading-relaxed text-ink/90">' + esc(p.trim()) + '</p>').join('');
+      } else {
+        location.href = 'blog.html';
+      }
+    } else {
+      const lista = document.querySelector('[data-lista-posts]');
+      lista.innerHTML = posts.map(p => `
+        <a href="blog.html?post=${encodeURIComponent(p.slug)}" class="group flex flex-col rounded-lg border border-edge bg-surface p-6 transition hover:border-lavanda/60 hover:shadow-glow">
+          <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-sol">${p.fecha}</p>
+          <h2 class="mt-3 font-serif text-xl leading-snug transition group-hover:text-lavanda">${esc(p.titulo)}</h2>
+          <p class="mt-2 text-sm leading-relaxed text-dim">${esc(p.extracto)}</p>
+          <p class="mt-auto pt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-lavanda">Leer →</p>
+        </a>`).join('') || '<p class="text-sm text-dim">Todavía no hay posts. Se publican desde el panel admin.</p>';
+    }
+
+    document.querySelectorAll('[data-anio]').forEach(el => {
+      el.textContent = new Date().getFullYear();
+    });
+  </script>
+
+</body>
+</html>
