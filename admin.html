@@ -453,6 +453,20 @@
           </div>
 
           <div class="mt-6 rounded-lg border border-edge bg-surface p-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 class="font-serif text-lg">Respaldo total (1 clic)</h3>
+                <p class="mt-1 text-sm text-dim">Descarga todo lo guardado en este navegador (hero, catálogo, posts, orden, mensajes, pagos). Pasá el archivo por WhatsApp/mail para publicarlo.</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="rounded-md bg-lavanda px-4 py-2 text-sm font-medium text-panel transition hover:brightness-110" data-backup-export>Descargar respaldo ↓</button>
+                <label class="cursor-pointer rounded-md border border-lavanda px-4 py-2 text-sm text-lavanda transition hover:bg-lavanda hover:text-panel">Cargar respaldo<input type="file" accept="application/json" class="hidden" data-backup-import></label>
+              </div>
+            </div>
+            <p class="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-dim" data-backup-msg></p>
+          </div>
+
+          <div class="mt-6 rounded-lg border border-edge bg-surface p-6">
             <h3 class="font-serif text-lg">Nota de integración</h3>
             <p class="mt-3 text-sm leading-relaxed text-dim">
               Esta demo guarda datos en tu navegador (localStorage). Para producción: conectar
@@ -926,6 +940,30 @@
       a.download = 'suscriptores.csv';
       a.click();
       URL.revokeObjectURL(a.href);
+    });
+    $('[data-backup-export]')?.addEventListener('click', () => {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('fabrica_')) data[k] = localStorage.getItem(k); }
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'fabrica-backup-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      const m = document.querySelector('[data-backup-msg]'); if (m) m.textContent = 'Respaldo descargado: ' + Object.keys(data).length + ' claves.';
+    });
+    $('[data-backup-import]')?.addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          let n = 0; Object.entries(data).forEach(([k,v]) => { if (k.startsWith('fabrica_')) { localStorage.setItem(k, v); n++; } });
+          const m = document.querySelector('[data-backup-msg]'); if (m) m.textContent = 'Respaldo cargado: ' + n + ' claves. Recargando…';
+          setTimeout(() => location.reload(), 800);
+        } catch { alert('Archivo inválido'); }
+      };
+      r.readAsText(f);
     });
 
     const CAMPOS_IMPORT = [
