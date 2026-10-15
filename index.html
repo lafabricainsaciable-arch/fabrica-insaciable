@@ -65,19 +65,16 @@
          <li><a class="transition hover:text-ink" href="blog.html">Blog</a></li>
          <li><a class="transition hover:text-ink" href="#contacto">Contacto</a></li>
        </ul>
-       <button id="menuBtn" type="button" class="md:hidden rounded-md border border-edge px-3 py-2 text-dim transition hover:border-lavanda hover:text-lavanda" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
-         <span id="menuIco">☰</span>
-       </button>
-       <div id="mobileMenu" class="hidden absolute left-0 right-0 top-full border-b border-edge bg-panel/98 md:hidden">
-         <ul class="flex flex-col gap-1 px-6 py-4 text-sm text-dim">
-           <li><a class="block py-2 transition hover:text-ink" href="#ideas" data-mobile-link>Ideas</a></li>
-           <li><a class="block py-2 transition hover:text-ink" href="#punto-de-partida" data-mobile-link>Punto de partida</a></li>
-           <li><a class="block py-2 transition hover:text-ink" href="#sobre-nos" data-mobile-link>Sobre Nos</a></li>
-           <li><a class="block py-2 transition hover:text-ink" href="#pensamiento-creativo" data-mobile-link>Pensamiento Creativo</a></li>
-           <li><a class="block py-2 transition hover:text-ink" href="#primer-paso" data-mobile-link>Primer Paso</a></li>
-           <li><a class="block py-2 transition hover:text-ink" href="blog.html" data-mobile-link>Blog</a></li>
-           <li><a class="block py-2 transition hover:text-ink" href="#contacto" data-mobile-link>Contacto</a></li>
-           <li><a class="block py-2 transition hover:text-ink" href="https://ar.pinterest.com/lafabricainsaciable/" target="_blank" rel="noopener" data-mobile-link>Pinterest</a></li>
+       <div id="mobileMenu" class="hidden fixed left-0 right-0 top-[64px] z-40 border-b border-edge bg-panel md:hidden shadow-glow">
+         <ul class="flex flex-col gap-1 px-6 py-4 text-base text-ink">
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="#ideas" data-mobile-link>Ideas</a></li>
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="#punto-de-partida" data-mobile-link>Punto de partida</a></li>
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="#sobre-nos" data-mobile-link>Sobre Nos</a></li>
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="#pensamiento-creativo" data-mobile-link>Pensamiento Creativo</a></li>
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="#primer-paso" data-mobile-link>Primer Paso</a></li>
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="blog.html" data-mobile-link>Blog</a></li>
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="#contacto" data-mobile-link>Contacto</a></li>
+           <li><a class="block rounded-md px-3 py-2 transition hover:bg-surface hover:text-lavanda" href="https://ar.pinterest.com/lafabricainsaciable/" target="_blank" rel="noopener" data-mobile-link>Pinterest</a></li>
          </ul>
        </div>
        <div class="flex items-center gap-2">
@@ -88,6 +85,9 @@
            Login
          </a>
        </div>
+       <button id="menuBtn" type="button" class="md:hidden rounded-md border border-edge px-3 py-2 text-dim transition hover:border-lavanda hover:text-lavanda" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+         <span id="menuIco">☰</span>
+       </button>
     </nav>
   </header>
 
