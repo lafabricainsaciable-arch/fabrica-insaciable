@@ -12,3 +12,5 @@ window.SECCIONES_DEFECTO = [
   { id: "newsletter", nombre: "Newsletter", visible: true },
   { id: "contacto", nombre: "Contacto", visible: true }
 ];
+
+window.DATOS_VERSION = "2026-10-15";

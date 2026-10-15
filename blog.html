@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,600&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="contenido.defaults.js"></script>
   <script src="posts.defaults.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -105,8 +106,17 @@
     const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem('fabrica_' + k)); return v ?? d; } catch { return d; } };
     const esc = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-    let posts = load('posts', window.POSTS_DEFECTO);
-    if (!localStorage.getItem('fabrica_posts')) localStorage.setItem('fabrica_posts', JSON.stringify(posts));
+    let posts;
+    if (load('datos_version', null) !== window.DATOS_VERSION) {
+      posts = window.POSTS_DEFECTO.slice();
+      try {
+        localStorage.setItem('fabrica_posts', JSON.stringify(posts));
+        localStorage.setItem('fabrica_datos_version', JSON.stringify(window.DATOS_VERSION));
+      } catch (e) {}
+    } else {
+      posts = load('posts', window.POSTS_DEFECTO);
+      if (!localStorage.getItem('fabrica_posts')) localStorage.setItem('fabrica_posts', JSON.stringify(posts));
+    }
 
     const fechaLarga = f => new Date(f + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
     const params = new URLSearchParams(location.search);

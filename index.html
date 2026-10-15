@@ -783,24 +783,17 @@
     const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem('fabrica_' + k)); return v ?? d; } catch { return d; } };
     const esc = s => (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-    let catalogo = load('catalogo', window.CATALOGO_DEFECTO);
-    // Limpieza: si el catalogo contiene ideas tech de Arvure (Leads CRM etc.), restaurar solo Fabrica
-    {
-      const esArvure = i => /Leads CRM|Web que convierte|app interna|nodo central|scraping/i.test((i.titulo||'') + ' ' + (i.descripcion||''));
-      if (catalogo.some(esArvure)) {
-        catalogo = window.CATALOGO_DEFECTO.slice();
+    let catalogo;
+    // Version de datos: si el sitio publicado trajo contenido nuevo, se pisa lo viejo guardado
+    if (load('datos_version', null) !== window.DATOS_VERSION) {
+      catalogo = window.CATALOGO_DEFECTO.slice();
+      try {
         localStorage.setItem('fabrica_catalogo', JSON.stringify(catalogo));
-      }
-    }
-    if (!localStorage.getItem('fabrica_catalogo')) localStorage.setItem('fabrica_catalogo', JSON.stringify(catalogo));
-    // migracion: agrega eje y la 4ta idea si venis de una version previa con 3 items
-    {
-      const defaults = window.CATALOGO_DEFECTO;
-      const ids = new Set(catalogo.map(i => i.id));
-      defaults.forEach(d => { if (!ids.has(d.id)) catalogo.push(d); });
-      let migrated = false;
-      catalogo.forEach(i => { if (!i.eje) { i.eje = defaults.find(d => d.id === i.id)?.eje || 'Empresas'; migrated = true; } });
-      if (migrated || catalogo.length !== defaults.length) localStorage.setItem('fabrica_catalogo', JSON.stringify(catalogo));
+        localStorage.setItem('fabrica_hero', JSON.stringify(window.HERO_DEFECTO));
+        localStorage.setItem('fabrica_datos_version', JSON.stringify(window.DATOS_VERSION));
+      } catch (e) {}
+    } else {
+      catalogo = load('catalogo', window.CATALOGO_DEFECTO);
     }
     let filtroEje = 'todas';
 
