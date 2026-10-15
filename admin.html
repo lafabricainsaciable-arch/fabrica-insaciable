@@ -836,7 +836,7 @@
       const sel = v.slice(s,e) || 'texto';
       ta.value = v.slice(0,s) + '<strong>' + sel + '</strong>' + v.slice(e);
       ta.focus(); ta.selectionStart = s+8; ta.selectionEnd = s+8+sel.length;
-    }); // end bold toolbar
+    }));
     function abrirIdea(id) {
       const i = catalogo.find(x => x.id === id) || { id: 'idea_' + String(catalogo.length + 1).padStart(3, '0'), tipo: 'Cursos', estado: 'disponible', precio: '', imagen: '', detalle: '' };
       ideaEditando = i;
