@@ -13,4 +13,4 @@ window.SECCIONES_DEFECTO = [
   { id: "contacto", nombre: "Contacto", visible: true }
 ];
 
-window.DATOS_VERSION = "2026-10-15";
+window.DATOS_VERSION = "2026-10-15-2";

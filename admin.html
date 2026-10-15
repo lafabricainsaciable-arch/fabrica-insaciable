@@ -523,10 +523,9 @@
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <label for="i-tipo" class="mb-1 block text-xs uppercase tracking-[0.2em] text-dim">Tipo</label>
-          <select id="i-tipo" class="w-full rounded-md border border-edge bg-panel px-4 py-3 text-sm focus:border-lavanda focus:outline-none">
-            <option value="completa">Completa</option>
-            <option value="rapida">Rápida</option>
-          </select>
+          <input id="i-tipo" list="i-tipo-list" required placeholder="Cursos" class="w-full rounded-md border border-edge bg-panel px-4 py-3 text-sm focus:border-lavanda focus:outline-none">
+          <datalist id="i-tipo-list"></datalist>
+          <button type="button" id="i-tipo-manage" class="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-dim transition hover:text-lavanda">gestionar tipos →</button>
         </div>
         <div>
           <label for="i-eje" class="mb-1 block text-xs uppercase tracking-[0.2em] text-dim">Eje</label>
@@ -557,11 +556,11 @@
         <p class="mt-1 font-mono text-[10px] text-dim">Si no subís imagen se usa una por defecto. Máx. ~2 MB (localStorage).</p>
       </div>
       <div>
-        <label for="i-desc" class="mb-1 block text-xs uppercase tracking-[0.2em] text-dim">Descripción corta (card)</label>
+        <div class="mb-1 flex items-center justify-between"><label for="i-desc" class="text-xs uppercase tracking-[0.2em] text-dim">Descripción corta (card)</label><button type="button" data-bold-insert="i-desc" class="rounded border border-edge px-2 py-1 font-mono text-[10px] text-dim transition hover:border-lavanda hover:text-lavanda">Negrita</button></div>
         <textarea id="i-desc" rows="2" required class="w-full rounded-md border border-edge bg-panel px-4 py-3 text-sm focus:border-lavanda focus:outline-none"></textarea>
       </div>
       <div>
-        <label for="i-detalle" class="mb-1 block text-xs uppercase tracking-[0.2em] text-dim">Detalle (modal rápido)</label>
+        <div class="mb-1 flex items-center justify-between"><label for="i-detalle" class="text-xs uppercase tracking-[0.2em] text-dim">Detalle (modal rápido)</label><button type="button" data-bold-insert="i-detalle" class="rounded border border-edge px-2 py-1 font-mono text-[10px] text-dim transition hover:border-lavanda hover:text-lavanda">Negrita</button></div>
         <textarea id="i-detalle" rows="3" class="w-full rounded-md border border-edge bg-panel px-4 py-3 text-sm focus:border-lavanda focus:outline-none"></textarea>
       </div>
       <div class="flex gap-3">
@@ -810,13 +809,41 @@
     }
 
     let ideaEditando = null;
+    const titleTipo = s => (s || '').trim().charAt(0).toUpperCase() + (s || '').trim().slice(1);
+    let tiposIdea = load('tipos_idea', ['Cursos','Servicios','Intervenciones']);
+    if (!Array.isArray(tiposIdea) || !tiposIdea.length) tiposIdea = ['Cursos','Servicios','Intervenciones'];
+    function renderTiposIdea(){
+      const dl = document.getElementById('i-tipo-list'); if (!dl) return;
+      dl.innerHTML = tiposIdea.map(t => `<option value="${esc(titleTipo(t))}"></option>`).join('');
+    }
+    renderTiposIdea();
+    document.getElementById('i-tipo-manage')?.addEventListener('click', () => {
+      const nuevo = prompt('Nuevo tipo (borrar: escribí ELIMINAR : nombre):');
+      if(!nuevo) return;
+      if (nuevo.toUpperCase().startsWith('ELIMINAR')) {
+        const nombre = nuevo.split(':')[1]?.trim(); if(!nombre) return;
+        tiposIdea = tiposIdea.filter(t => t.toLowerCase() !== nombre.toLowerCase());
+      } else {
+        if (!tiposIdea.some(t => t.toLowerCase() === nuevo.trim().toLowerCase())) tiposIdea.push(nuevo.trim());
+      }
+      tiposIdea = tiposIdea.map(titleTipo);
+      store('tipos_idea', tiposIdea); renderTiposIdea(); alert('Tipos actualizados.');
+    });
+    // bold toolbar
+    document.querySelectorAll('[data-bold-insert]').forEach(b => b.addEventListener('click', () => {
+      const ta = document.getElementById(b.dataset.boldInsert); if(!ta) return;
+      const s = ta.selectionStart, e = ta.selectionEnd, v = ta.value;
+      const sel = v.slice(s,e) || 'texto';
+      ta.value = v.slice(0,s) + '<strong>' + sel + '</strong>' + v.slice(e);
+      ta.focus(); ta.selectionStart = s+8; ta.selectionEnd = s+8+sel.length;
+    }); // end bold toolbar
     function abrirIdea(id) {
-      const i = catalogo.find(x => x.id === id) || { id: 'idea_' + String(catalogo.length + 3).padStart(3, '0'), tipo: 'completa', estado: 'disponible', precio: '', imagen: '', detalle: '' };
+      const i = catalogo.find(x => x.id === id) || { id: 'idea_' + String(catalogo.length + 1).padStart(3, '0'), tipo: 'Cursos', estado: 'disponible', precio: '', imagen: '', detalle: '' };
       ideaEditando = i;
       $('[data-idea-dialog-titulo]').textContent = catalogo.some(x => x.id === id) ? 'Editar idea' : 'Nueva idea';
       $('[data-i-id]').value = i.id;
       $('#i-titulo').value = i.titulo || '';
-      $('#i-tipo').value = i.tipo || 'completa';
+      $('#i-tipo').value = titleTipo(i.tipo) || tiposIdea[0] || 'Cursos';
       $('#i-eje').value = i.eje || 'Empresas';
       $('#i-estado').value = i.estado || 'disponible';
       $('#i-precio').value = i.precio || '';
@@ -849,7 +876,7 @@
       const id = ideaEditando.id;
       const guardar = {
         id,
-        tipo: $('#i-tipo').value,
+        tipo: titleTipo($('#i-tipo').value),
         eje: $('#i-eje').value,
         titulo: $('#i-titulo').value.trim(),
         estado: $('#i-estado').value,
@@ -1354,18 +1381,37 @@
         </div>`;
       }
       const bg = (typeof ordenSecciones[idx] === 'object' && ordenSecciones[idx].bg) || '';
-      return `<div class="rounded-lg border ${visible ? 'border-edge' : 'border-dashed border-edge opacity-60'} bg-surface p-4">
-        <div class="flex items-center justify-between gap-2">
+      const bgImg = (typeof ordenSecciones[idx] === 'object' && ordenSecciones[idx].bgImg) || '';
+      return `<details class="rounded-lg border ${visible ? 'border-edge' : 'border-dashed border-edge opacity-60'} bg-surface">
+        <summary class="flex cursor-pointer items-center justify-between gap-2 px-4 py-3">
           <h4 class="font-serif text-base"><span class="font-mono text-xs text-dim mr-2">${String(idx+1).padStart(2,'0')}</span>${nombre}</h4>
-          <span class="flex items-center gap-1">
+          <span class="flex items-center gap-2">
+            <span class="font-mono text-[10px] uppercase tracking-[0.15em] ${visible ? 'text-lavanda' : 'text-dim'}">${visible ? 'visible' : 'oculta'}</span>
+            <span class="text-dim">▾</span>
+          </span>
+        </summary>
+        <div class="space-y-3 border-t border-edge px-4 py-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="text-xs text-dim">Renombrar</label>
+            <input type="text" value="${esc(nombre)}" data-nombre="${idx}" class="flex-1 rounded border border-edge bg-panel px-2 py-1 text-xs focus:border-lavanda focus:outline-none">
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs text-dim">Fondo color</span>
             <input type="color" value="${bg || '#34344E'}" data-bg="${idx}" class="h-6 w-6 rounded border border-edge p-0" title="Color de fondo">
+            <span class="text-xs text-dim">Fondo imagen</span>
+            <input type="file" accept="image/*" data-bgimg="${idx}" class="max-w-[160px] text-xs">
+            <button type="button" data-bgimg-clear="${idx}" class="text-xs text-dim hover:text-lavanda">Quitar imagen</button>
+            <button type="button" data-bg-clear="${idx}" class="text-xs text-dim hover:text-lavanda">Quitar color</button>
+          </div>
+          ${bgImg ? '<p class="font-mono text-[10px] text-dim">Imagen de fondo cargada.</p>' : ''}
+          <div class="flex items-center gap-1">
             <button type="button" data-orden-up="${idx}" class="rounded border border-edge px-2 py-1 font-mono text-xs ${idx===0?'opacity-30':''}" ${idx===0?'disabled':''}>↑</button>
             <button type="button" data-orden-down="${idx}" class="rounded border border-edge px-2 py-1 font-mono text-xs ${idx===ordenSecciones.length-1?'opacity-30':''}" ${idx===ordenSecciones.length-1?'disabled':''}>↓</button>
-            <button type="button" data-orden-vis="${idx}" class="rounded border ${visible ? 'border-lavanda text-lavanda' : 'border-edge text-dim'} px-2 py-1 font-mono text-xs">${visible ? '👁' : '🚫'}</button>
-          </span>
+            <button type="button" data-orden-vis="${idx}" class="ml-auto rounded border ${visible ? 'border-lavanda text-lavanda' : 'border-edge text-dim'} px-2 py-1 font-mono text-xs">${visible ? '👁 visible' : '🚫 oculta'}</button>
+          </div>
+          <p class="font-mono text-[10px] text-dim">ID: ${id}${bg ? ' · color ' + bg : ''}</p>
         </div>
-        <p class="mt-2 text-xs text-dim">ID: ${id} · ${visible ? 'visible' : 'oculta'}${bg ? ' · fondo ' + bg : ''}</p>
-      </div>`;
+      </details>`;
     }
 
     function renderEditoresOrden(){
@@ -1431,6 +1477,38 @@
       cont.querySelectorAll('[data-bg]').forEach(inp => inp.addEventListener('input', () => { const i = parseInt(inp.dataset.bg); let o = ordenSecciones[i]; if (typeof o === 'string') { o = { id: o, visible: true }; ordenSecciones[i] = o; } o.bg = inp.value; renderPreview(); }));
       cont.querySelectorAll('[data-bg-hero]').forEach(inp => inp.addEventListener('input', () => { const i = parseInt(inp.dataset.bgHero); let o = ordenSecciones[i]; if (typeof o === 'string') { o = { id: o, visible: true }; ordenSecciones[i] = o; } o.bg = inp.value; renderPreview(); }));
       cont.querySelectorAll('[data-bg-clear-hero]').forEach(btn => btn.addEventListener('click', () => { const i = parseInt(btn.dataset.bgClearHero); let o = ordenSecciones[i]; if (typeof o === 'object' && o.bg) { delete o.bg; renderEditoresOrden(); renderPreview(); } }));
+      cont.querySelectorAll('[data-bgimg]').forEach(inp => inp.addEventListener('change', e => {
+        const file = e.target.files[0]; if(!file) return;
+        if(file.size > 2*1024*1024){ alert('Imagen muy pesada (m\u00e1x 2MB)'); e.target.value=''; return; }
+        const i = parseInt(inp.dataset.bgimg);
+        const r = new FileReader();
+        r.onload = ev => {
+          let o = ordenSecciones[i]; if (typeof o === 'string') { o = { id: o, visible: true }; ordenSecciones[i] = o; }
+          o.bgImg = ev.target.result; delete o.bg;
+          renderEditoresOrden(); renderPreview();
+        };
+        r.readAsDataURL(file);
+      }));
+      cont.querySelectorAll('[data-bgimg-clear]').forEach(btn => btn.addEventListener('click', () => {
+        const i = parseInt(btn.dataset.bgimgClear);
+        let o = ordenSecciones[i];
+        if (typeof o === 'object' && o.bgImg) { delete o.bgImg; renderEditoresOrden(); renderPreview(); }
+      }));
+      cont.querySelectorAll('[data-bg-clear]').forEach(btn => btn.addEventListener('click', () => {
+        const i = parseInt(btn.dataset.bgClear);
+        let o = ordenSecciones[i];
+        if (typeof o === 'object' && o.bg) { delete o.bg; renderEditoresOrden(); renderPreview(); }
+      }));
+      cont.querySelectorAll('[data-nombre]').forEach(inp => inp.addEventListener('change', () => {
+        const i = parseInt(inp.dataset.nombre);
+        const id = typeof ordenSecciones[i] === 'string' ? ordenSecciones[i] : ordenSecciones[i].id;
+        const nm = inp.value.trim(); if(!nm) return;
+        let customs = JSON.parse(localStorage.getItem('fabrica_custom_nombres') || '{}');
+        customs[id] = nm; localStorage.setItem('fabrica_custom_nombres', JSON.stringify(customs));
+        let o = ordenSecciones[i];
+        if (typeof o === 'object') o.nombre = nm;
+        renderEditoresOrden(); renderPreview();
+      }));
       cont.querySelector('[data-agregar-seccion]')?.addEventListener('click', () => {
         const nombre = prompt('Nombre de la nueva sección (ej: Testimonios)');
         if (!nombre) return;
