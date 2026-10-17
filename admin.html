@@ -1382,7 +1382,7 @@
       }
       const bg = (typeof ordenSecciones[idx] === 'object' && ordenSecciones[idx].bg) || '';
       const bgImg = (typeof ordenSecciones[idx] === 'object' && ordenSecciones[idx].bgImg) || '';
-      return `<details class="rounded-lg border ${visible ? 'border-edge' : 'border-dashed border-edge opacity-60'} bg-surface">
+      return `<details data-sec-idx="${idx}" class="rounded-lg border ${visible ? 'border-edge' : 'border-dashed border-edge opacity-60'} bg-surface">
         <summary class="flex cursor-pointer items-center justify-between gap-2 px-4 py-3">
           <h4 class="font-serif text-base"><span class="font-mono text-xs text-dim mr-2">${String(idx+1).padStart(2,'0')}</span>${nombre}</h4>
           <span class="flex items-center gap-2">
@@ -1423,7 +1423,11 @@
         const nombre = (window.SECCIONES_DEFECTO.find(s => s.id === id)?.nombre) || JSON.parse(localStorage.getItem('fabrica_custom_nombres')||'{}')[id] || id;
         const isHero = id === 'inicio';
         return seccionCardHTML(id, nombre, idx, visible, isHero);
-      }).join('') + `<button type="button" class="w-full rounded-md border border-dashed border-edge px-4 py-2.5 text-sm text-dim transition hover:border-lavanda hover:text-lavanda" data-agregar-seccion>+ Agregar sección</button>`;
+      }).join('') + `<div class="flex gap-2">
+        <button type="button" data-expandir-todo class="flex-1 rounded-md border border-edge px-4 py-2 text-xs text-dim transition hover:border-lavanda hover:text-lavanda">Desplegar todo</button>
+        <button type="button" data-colapsar-todo class="flex-1 rounded-md border border-edge px-4 py-2 text-xs text-dim transition hover:border-lavanda hover:text-lavanda">Colapsar todo</button>
+      </div>
+      <button type="button" class="w-full rounded-md border border-dashed border-edge px-4 py-2.5 text-sm text-dim transition hover:border-lavanda hover:text-lavanda" data-agregar-seccion>+ Agregar sección</button>`;
       const hForm = cont.querySelector('[data-form-hero]');
       if (hForm) {
         document.getElementById('h-badge').value = hero.badge || '';
@@ -1471,6 +1475,12 @@
         });
         cont.querySelector('[data-hero-reset]')?.addEventListener('click', () => { localStorage.removeItem('fabrica_hero'); hero = structuredClone(window.HERO_DEFECTO); renderEditoresOrden(); renderPreview(); alert('Hero restaurado.'); });
       }
+      const detalles = cont.querySelectorAll('details[data-sec-idx]');
+      detalles.forEach(d => d.querySelector('summary')?.addEventListener('click', () => {
+        if (!d.open) detalles.forEach(x => { if (x !== d) x.open = false; });
+      }));
+      cont.querySelector('[data-expandir-todo]')?.addEventListener('click', () => detalles.forEach(d => d.open = true));
+      cont.querySelector('[data-colapsar-todo]')?.addEventListener('click', () => detalles.forEach(d => { d.open = false; }));
       cont.querySelectorAll('[data-orden-up]').forEach(b => b.addEventListener('click', () => { const i = parseInt(b.dataset.ordenUp); if (i>0) { const tmp = ordenSecciones[i-1]; ordenSecciones[i-1]=ordenSecciones[i]; ordenSecciones[i]=tmp; renderEditoresOrden(); renderPreview(); } }));
       cont.querySelectorAll('[data-orden-down]').forEach(b => b.addEventListener('click', () => { const i = parseInt(b.dataset.ordenDown); if (i<ordenSecciones.length-1) { const tmp = ordenSecciones[i+1]; ordenSecciones[i+1]=ordenSecciones[i]; ordenSecciones[i]=tmp; renderEditoresOrden(); renderPreview(); } }));
       cont.querySelectorAll('[data-orden-vis]').forEach(b => b.addEventListener('click', () => { const i = parseInt(b.dataset.ordenVis); const o = ordenSecciones[i]; if (typeof o === 'string') ordenSecciones[i] = { id: o, visible: false }; else o.visible = !o.visible; renderEditoresOrden(); renderPreview(); }));
@@ -1531,6 +1541,7 @@
     function renderOrdenLista(){ renderEditoresOrden(); }
     renderEditoresOrden();
     function renderPreview(){
+      store('orden_secciones', ordenSecciones);
       const b = document.querySelector('#h-badge')?.value.trim() || hero.badge;
       const t1 = document.querySelector('#h-t1')?.value.trim() || hero.titulo1;
       const t2 = document.querySelector('#h-t2')?.value.trim() || hero.titulo2;
@@ -1550,23 +1561,34 @@
         const id = typeof o === 'string' ? o : o.id;
         const visible = typeof o === 'string' ? true : o.visible !== false;
         const nombre = (window.SECCIONES_DEFECTO.find(s => s.id === id)?.nombre) || JSON.parse(localStorage.getItem('fabrica_custom_nombres')||'{}')[id] || id;
-        const isTicker = id === 'servicios';
         const isHero = id === 'inicio';
-        // fondo según claro/oscuro real de index.html
-        const customBg = typeof o === 'object' ? o.bg : null;
+        const bg = (typeof o === 'object' && o.bg) || '';
+        const bgImg = (typeof o === 'object' && o.bgImg) || '';
         const isClaro = ['ideas','sobre-nos','primer-paso','newsletter'].includes(id);
-        const bg = customBg ? '' : (isClaro ? 'bg-surface' : 'bg-panel');
-        const style = customBg ? ` style="background-color: ${customBg}"` : '';
-        const label = isTicker ? 'Ticker · ' + (document.querySelector('#h-ejes')?.value.trim() || hero.ejes || 'Empresas · Personas · Perfiles · Nodos').slice(0,28) : nombre;
-        return `<div class="rounded border ${visible ? 'border-edge' : 'border-dashed border-edge opacity-40'} ${bg} px-2 py-1.5 text-xs ${!visible?'opacity-50':''}"${style}>
-          <div class="flex items-center justify-between gap-1">
-            <span class="truncate"><span class="font-mono text-[10px] text-dim">${String(i+1).padStart(2,'0')}</span> ${label}</span>
+        const base = isClaro ? '#34344E' : '#0A0A14';
+        const bgStyle = bgImg
+          ? `background-image:url(${bgImg});background-size:cover;background-position:center`
+          : `background-color:${bg || base}`;
+        return `<div data-abrir-seccion="${i}" title="Editar esta sección" class="cursor-pointer overflow-hidden rounded border ${visible ? 'border-edge' : 'border-dashed border-edge opacity-40'} hover:border-lavanda">
+          <div class="h-10 w-full" style="${bgStyle}"></div>
+          <div class="flex items-center justify-between gap-2 px-2 py-1.5">
+            <span class="truncate text-xs"><span class="font-mono text-[10px] text-dim">${String(i+1).padStart(2,'0')}</span> ${esc(nombre)}</span>
             <span class="shrink-0 font-mono text-[9px] ${visible?'text-lavanda':'text-dim'}">${visible?'ON':'OFF'}</span>
           </div>
-          ${isTicker ? '<div class="mt-1 h-1.5 rounded bg-lavanda/30"></div>' : ''}
-          ${isHero ? '<div class="mt-1 h-1.5 rounded bg-lavanda/20"></div>' : ''}
+          <div class="flex flex-wrap gap-1 px-2 pb-1.5">
+            <span class="rounded bg-panel px-1.5 py-0.5 font-mono text-[9px] text-dim">${isHero?'HERO':'SECCIÓN'}</span>
+            ${bg ? `<span class="rounded border border-edge px-1.5 py-0.5 font-mono text-[9px] text-dim" title="${bg}">color</span>` : ''}
+            ${bgImg ? '<span class="rounded border border-edge px-1.5 py-0.5 font-mono text-[9px] text-dim">imagen</span>' : ''}
+          </div>
         </div>`;
       }).join('');
+      cont.querySelectorAll('[data-abrir-seccion]').forEach(el => el.addEventListener('click', () => {
+        const d = document.querySelector(`details[data-sec-idx="${el.dataset.abrirSeccion}"]`);
+        if (!d) return;
+        document.querySelectorAll('[data-editores-orden] details').forEach(x => { if (x !== d) x.open = false; });
+        d.open = true;
+        d.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }));
     }
     ['#h-badge','#h-t1','#h-t2','#h-parrafo','#h-b1','#h-b2','#h-ejes','#h-fig','#h-figl'].forEach(sel => {
       const el = document.querySelector(sel);
