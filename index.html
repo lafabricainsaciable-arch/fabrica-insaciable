@@ -954,6 +954,25 @@
       const fig = document.querySelector('[data-hero-fig]');
       if (fig) { if (hero.figcaption) fig.textContent = hero.figcaption; if (hero.figlink) fig.href = hero.figlink; }
 
+      // Contenido editable por sección (badge, título, copete, botones)
+      const contenidoSec = load('secciones', {});
+      const camposSec = window.SECCIONES_CAMPOS || {};
+      Object.keys(camposSec).forEach(id => {
+        const sec = document.getElementById(id);
+        if (!sec) return;
+        const vals = contenidoSec[id] || {};
+        camposSec[id].forEach(f => {
+          const v = vals[f.k];
+          if (v === undefined || v === null || v === '') return;
+          const el = sec.querySelector(f.sel);
+          if (!el) return;
+          if (f.type === 'html') el.innerHTML = v;
+          else if (f.type === 'href') el.setAttribute('href', v);
+          else if (f.type === 'src') el.src = v;
+          else el.textContent = v;
+        });
+      });
+
       // Crear secciones custom si no existen (agregadas desde admin)
       const customs = (() => { try { return JSON.parse(localStorage.getItem('fabrica_custom_nombres')||'{}'); } catch { return {}; } })();
       Object.keys(customs).forEach(id => {

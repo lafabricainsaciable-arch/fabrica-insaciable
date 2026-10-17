@@ -13,4 +13,54 @@ window.SECCIONES_DEFECTO = [
   { id: "contacto", nombre: "Contacto", visible: true }
 ];
 
+window.SECCIONES_CAMPOS = {
+  ideas: [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'header p.text-play', def: 'UNIVERSO DE IDEAS' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'header h2', def: 'Ideas que mueven<br><em class="text-lavanda">muchas ideas.</em>' },
+    { k: 'copete', label: 'Copete', type: 'html', sel: 'p.mb-10', def: 'Nuestro universo de ideas es amplio, variado y muy creativo. Con nuestra ayuda, podés crear tu propia idea desde cero, o sumarte a ideas nuevas que pueden ser de tu espíritu y agrado. Empezá tu propio recorrido…' }
+  ],
+  'punto-de-partida': [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'p.text-play', def: 'Punto de partida' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'h2', def: 'Tu idea a punto<br><em class="text-lavanda">de hacerse realidad.</em>' },
+    { k: 'copete', label: 'Copete', type: 'html', sel: 'h2 + p', def: '¿Querés hacer algo pero no sabés por dónde empezar o cómo darle forma? O en realidad… ¿No se te cae una idea? No te preocupes, por suerte estás en el sitio correcto, a punto de empezar a hacerla realidad. Si querés hacer todo rápido y sin una buena planificación, “La Fábrica” te va a poner un poquito incómodo y ansioso. Pero si querés marchar a paso firme, con una buena guía y acompañamiento, ESTE ES EL CAMINO. No somo gurúes ni seres mágicos, pero trabajamos seriamente y con creatividad.' },
+    { k: 'boton1', label: 'Botón 1 (texto)', type: 'text', sel: 'a[href="#contacto"]', def: 'Quiero dar mi primer paso →' },
+    { k: 'boton1link', label: 'Botón 1 (link)', type: 'href', sel: 'a[href="#contacto"]', def: '#contacto' }
+  ],
+  'sobre-nos': [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'p.text-play', def: 'FARE X FARE' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'h2', def: 'La cabeza<br><em class="text-lavanda">detrás de La Fábrica.</em>' },
+    { k: 'copete', label: 'Copete', type: 'html', sel: 'h2 + p', def: 'Sebastián Fare comanda un Estudio de Comunicación Creativa, digamos que <em>“a puerta entreabierta”</em>.' },
+    { k: 'boton1', label: 'Botón 1 (texto)', type: 'text', sel: 'a[href="#contacto"]', def: 'Iniciá Contacto' },
+    { k: 'boton1link', label: 'Botón 1 (link)', type: 'href', sel: 'a[href="#contacto"]', def: '#contacto' },
+    { k: 'boton2', label: 'Botón 2 (texto)', type: 'text', sel: 'a[href="#ideas"]', def: 'Revolver nuestro Universo de Ideas →' },
+    { k: 'boton2link', label: 'Botón 2 (link)', type: 'href', sel: 'a[href="#ideas"]', def: '#ideas' },
+    { k: 'imagen', label: 'Imagen (URL)', type: 'src', sel: 'figure img', def: '' },
+    { k: 'figcaption', label: 'Figcaption', type: 'text', sel: 'figure figcaption', def: 'La sala de montaje: donde la idea se termina de fabricar' }
+  ],
+  'pensamiento-creativo': [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'header p.text-play', def: 'Proceso Creativo' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'header h2', def: 'Ideas detrás de<br><em class="text-lavanda">cada idea.</em>' },
+    { k: 'copete', label: 'Copete', type: 'html', sel: 'p.italic', def: 'El <strong class="text-ink">Pensamiento Creativo Estratégico</strong>, es simplemente <strong class="text-ink">una forma de ver las cosas</strong>. Al principio puede tratarse tan sólo de una nueva experiencia; pero con el tiempo, al entender y sumarse a su lógica, se <strong class="text-ink">convierte</strong> en un <strong class="text-ink">método de trabajo</strong> en sí mismo que se sostiene a través de lineamientos fundamentales, como <strong class="text-ink">flexibilidad</strong>, <strong class="text-ink">simetría</strong> y <strong class="text-ink">multidisciplinariedad</strong>, y por qué no, hasta con una <strong class="text-ink">cuota subversiva</strong> para romper por momentos con lo comúnmente prestablecido.' }
+  ],
+  'primer-paso': [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'header p.text-play', def: 'SUMA DE IDEAS' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'header h2', def: '¿Cómo dar el <em class="text-lavanda">primer paso</em><br>con una idea?' }
+  ],
+  faq: [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'header p.text-play', def: 'Preguntas frecuentes' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'header h2', def: 'Lo que suelen<br><em class="text-lavanda">preguntar.</em>' }
+  ],
+  newsletter: [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'p.text-play', def: 'Antes de irte' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'h2', def: 'La idea que<br><em class="text-lavanda">no se deja atrapar.</em>' },
+    { k: 'copete', label: 'Copete', type: 'html', sel: 'h2 + p', def: 'Una vez al mes mandamos el análisis corto de una idea nueva — qué es lo que se muestra y qué es lo que se sostiene sin mostrarse del todo, y por qué. Sin spam, sin urgencia fabricada.' },
+    { k: 'boton1', label: 'Botón (texto)', type: 'text', sel: 'form button', def: 'Sumarme →' }
+  ],
+  contacto: [
+    { k: 'badge', label: 'Badge (arriba)', type: 'text', sel: 'p.text-play', def: 'Contacto' },
+    { k: 'titulo', label: 'Título', type: 'html', sel: 'h2', def: 'Hablemos de<br>tu <em class="text-lavanda">idea.</em>' },
+    { k: 'copete', label: 'Copete', type: 'html', sel: 'h2 + p', def: 'No importa si tenés una idea muy clara o apenas una sensación de lo que querés. Escribinos y lo charlamos — si tu proyecto tiene lo que necesitamos para fabricarlo bien, lo sabemos en la primera conversación.' }
+  ]
+};
+
 window.DATOS_VERSION = "2026-10-15-4";
