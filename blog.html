@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,600&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="contenido.defaults.js"></script>
   <script src="posts.defaults.js"></script>
+  <script src="datos.publicados.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -108,7 +109,8 @@
 
     let posts;
     if (load('datos_version', null) !== window.DATOS_VERSION) {
-      posts = window.POSTS_DEFECTO.slice();
+      const pub = window.DATOS_PUBLICADOS || {};
+      posts = (pub.posts || window.POSTS_DEFECTO).slice();
       try {
         localStorage.setItem('fabrica_posts', JSON.stringify(posts));
         localStorage.setItem('fabrica_datos_version', JSON.stringify(window.DATOS_VERSION));

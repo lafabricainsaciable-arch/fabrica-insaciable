@@ -12,6 +12,7 @@
   <script src="catalogo.defaults.js"></script>
   <script src="contenido.defaults.js"></script>
   <script src="posts.defaults.js"></script>
+  <script src="datos.publicados.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -104,6 +105,7 @@
             <span class="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-play align-middle"></span>
             Fábrica operativa
           </span>
+          <button type="button" data-publicar class="rounded-md bg-lavanda px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-panel transition hover:brightness-110">Publicar online</button>
           <a href="index.html" class="rounded-md border border-edge px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-dim transition hover:text-ink">Ver sitio →</a>
         </div>
       </header>
@@ -666,12 +668,17 @@
     let posts;
     // Version de datos: sincroniza con lo publicado (los borradores no publicados se pierden: exportar respaldo antes)
     if (load('datos_version', null) !== window.DATOS_VERSION) {
-      catalogo = window.CATALOGO_DEFECTO.slice();
-      posts = window.POSTS_DEFECTO.slice();
+      const pub = window.DATOS_PUBLICADOS || {};
+      catalogo = (pub.catalogo || window.CATALOGO_DEFECTO).slice();
+      posts = (pub.posts || window.POSTS_DEFECTO).slice();
       try {
         localStorage.setItem('fabrica_catalogo', JSON.stringify(catalogo));
         localStorage.setItem('fabrica_posts', JSON.stringify(posts));
-        localStorage.setItem('fabrica_hero', JSON.stringify(window.HERO_DEFECTO));
+        localStorage.setItem('fabrica_hero', JSON.stringify(pub.hero || window.HERO_DEFECTO));
+        if (pub.orden_secciones) localStorage.setItem('fabrica_orden_secciones', JSON.stringify(pub.orden_secciones));
+        if (pub.secciones) localStorage.setItem('fabrica_secciones', JSON.stringify(pub.secciones));
+        if (pub.custom_nombres) localStorage.setItem('fabrica_custom_nombres', JSON.stringify(pub.custom_nombres));
+        if (pub.tipos_idea) localStorage.setItem('fabrica_tipos_idea', JSON.stringify(pub.tipos_idea));
         localStorage.setItem('fabrica_datos_version', JSON.stringify(window.DATOS_VERSION));
       } catch (e) {}
     } else {
@@ -1646,6 +1653,61 @@
     // Refrescar al entrar a contenido
     const _origIrA = irA;
     irA = (sec) => { _origIrA(sec); if (sec === 'contenido') { renderHeroForm(); renderOrdenLista(); } };
+
+    // === Publicar online (sube los datos a GitHub para que queden en el sitio publicado) ===
+    const GH_REPO = 'lafabricainsaciable-arch/fabrica-insaciable';
+    const GH_BRANCH = 'main';
+    const GH_PATH = 'datos.publicados.js';
+    async function b64utf8(str){
+      const bytes = new TextEncoder().encode(str);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin);
+    }
+    async function publicarOnline(btn){
+      let token = load('gh_token', '');
+      if (!token) {
+        token = prompt('Token de GitHub (permiso de Contenidos: escritura sobre ' + GH_REPO + ').\nSe guarda solo en este navegador.');
+        if (!token) return;
+        store('gh_token', token.trim());
+        token = token.trim();
+      }
+      const version = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+      const data = {
+        version,
+        hero,
+        catalogo,
+        posts,
+        orden_secciones: ordenSecciones,
+        secciones: seccionesContenido,
+        custom_nombres: (() => { try { return JSON.parse(localStorage.getItem('fabrica_custom_nombres') || '{}'); } catch { return {}; } })(),
+        tipos_idea: load('tipos_idea', ['Cursos', 'Servicios', 'Intervenciones'])
+      };
+      const contenido = 'window.DATOS_PUBLICADOS = ' + JSON.stringify(data) + ';\n' +
+                        'window.DATOS_VERSION = ' + JSON.stringify(version) + ';\n';
+      const api = 'https://api.github.com/repos/' + GH_REPO;
+      const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+      const orig = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = 'Publicando…'; }
+      try {
+        const refRes = await fetch(api + '/git/ref/heads/' + GH_BRANCH, { headers });
+        if (!refRes.ok) throw new Error(refRes.status === 401 ? 'Token inválido o sin permisos (401).' : ('No pude leer la rama (' + refRes.status + ').'));
+        const baseCommit = (await refRes.json()).object.sha;
+        const commit = await (await fetch(api + '/git/commits/' + baseCommit, { headers })).json();
+        const blob = await (await fetch(api + '/git/blobs', { method: 'POST', headers, body: JSON.stringify({ content: await b64utf8(contenido), encoding: 'base64' }) })).json();
+        const tree = await (await fetch(api + '/git/trees', { method: 'POST', headers, body: JSON.stringify({ base_tree: commit.tree.sha, tree: [{ path: GH_PATH, mode: '100644', type: 'blob', sha: blob.sha }] }) })).json();
+        const nuevo = await (await fetch(api + '/git/commits', { method: 'POST', headers, body: JSON.stringify({ message: 'Publicar contenido desde admin (' + version + ')', tree: tree.sha, parents: [baseCommit] }) })).json();
+        const upd = await fetch(api + '/git/refs/heads/' + GH_BRANCH, { method: 'PATCH', headers, body: JSON.stringify({ sha: nuevo.sha, force: false }) });
+        if (!upd.ok) throw new Error('No pude actualizar la rama (' + upd.status + ').');
+        localStorage.setItem('fabrica_datos_version', JSON.stringify(version));
+        alert('Publicado online ✓\nVersión ' + version + '\n\nEn 1-2 minutos el sitio se actualiza para todos.');
+      } catch (e) {
+        alert('Error al publicar: ' + e.message + '\n\nRevisá que el token tenga permiso de escritura de contenidos en ' + GH_REPO + '.');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = orig || 'Publicar online'; }
+      }
+    }
+    $('[data-publicar]')?.addEventListener('click', e => publicarOnline(e.currentTarget));
   </script>
 
 </body>
